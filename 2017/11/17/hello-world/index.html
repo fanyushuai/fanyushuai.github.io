@@ -68,6 +68,9 @@
 <div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
 <![endif]-->
 
+{% if theme.canvas_nest %}
+<script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+{% endif %}
 <body>
     <header class="main-header">
     <div class="main-header-box">
@@ -94,7 +97,7 @@
                 <div class="collapse navbar-collapse" id="main-menu">
                     <ul class="menu">
                         
-                            <li role="presentation"><a href="/"><i class="fa fa-fw "></i>Home</a>
+                            <li role="presentation"><a href="/"><i class="fa fa-fw "></i>首页</a>
                             </li>
                         
                             <li role="presentation"><a href="/"><i class="fa fa-fw "></i>前端</a>
@@ -171,7 +174,7 @@
         </div>
         <div>
             
-                License: <a href="https://creativecommons.org/licenses/by-nc-nd/3.0/" target="_blank">
+                版权声明: <a href="https://creativecommons.org/licenses/by-nc-nd/3.0/" target="_blank">
 知识共享署名-非商业性使用-禁止演绎 3.0 未本地化版本许可协议（CC BY-NC-ND 3.0）
 </a>
             
@@ -248,7 +251,7 @@
         
         
     <div class="widget">
-      <h3 class="title">Archives</h3>
+      <h3 class="title">归档</h3>
         <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/"><i class="fa" aria-hidden="true">November 2017</i></a><span class="archive-list-count">1</span></li></ul>
     </div>
 
@@ -256,7 +259,7 @@
         
         
   <div class="widget">
-    <h3 class="title">Tag Cloud</h3>
+    <h3 class="title">标签云</h3>
     <div class="content tag-cloud">
         <a href="/tags/hexo/" style="font-size: 10px;">hexo</a>
     </div>
@@ -266,7 +269,7 @@
         
         
     <div class="widget">
-        <h3 class="title">Friends</h3>
+        <h3 class="title">友链</h3>
         <div class="content friends-link">
         
             <a href="https://fanyushuai.github.io/" class="fa" target="_blank">个人博客</a>
@@ -310,6 +313,11 @@
     </div>
 </div>
 
+
+  <script src="/assets/highlight.pack.js?rev=@@hash"></script>
+  <script>
+    hljs.initHighlightingOnLoad(); //初始化代码高亮 
+  </script>
 
 <script src="/js/app.js?rev=@@hash"></script>
 
