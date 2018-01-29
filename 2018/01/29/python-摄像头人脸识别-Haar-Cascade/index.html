@@ -24,7 +24,7 @@
     <!--Title-->
 
 
-<title>Hello Hexo | Hexo</title>
+<title>python 人脸识别-Haar Cascade | Hexo</title>
 
 
     <link rel="alternate" href="/" title="Hexo" type="application/atom+xml">
@@ -122,9 +122,9 @@
                     <p id="process"></p>
 <article class="post">
     <div class="post-head">
-        <h1 id="Hello Hexo">
+        <h1 id="python 人脸识别-Haar Cascade">
             
-            Hello Hexo
+            python 人脸识别-Haar Cascade
             
         </h1>
         <div class="post-meta">
@@ -132,7 +132,7 @@
     
     <span class="categories-meta fa-wrap">
         <i class="fa fa-folder-open-o"></i>
-        <span>无</span>
+        <span>python</span>
     </span>
     
     
@@ -140,7 +140,7 @@
         <i class="fa fa-tags"></i>
         <span class="tags-meta">
             
-            hexo
+            Haar Cascade
             
         </span>
     </span>
@@ -148,7 +148,7 @@
     
     <span class="fa-wrap">
         <i class="fa fa-clock-o"></i>
-        <span class="date-meta">2017/11/17</span>
+        <span class="date-meta">2018/01/29</span>
     </span>
 </div>
 
@@ -157,10 +157,55 @@
     </div>
     
     <div class="post-body">
-        <p>Hexo,终于弄好了！<br>1.安装nodejs<br>2.安装git<br>3.新建文件夹进入<br>sudo npm install -g hexo （切换淘宝镜像npm config set registry <a href="https://registry.npm.taobao.org，查看npm" target="_blank" rel="noopener">https://registry.npm.taobao.org，查看npm</a> config get registry）<br>4.hexo init<br>5.hexo generate（hexo g）<br>6.修改 _config.yml<br>deploy:<br>     type: git<br>     repo: <a href="https://github.com/fanyushuai/fanyushuai.github.io.git（到gitgub新建repositories）" target="_blank" rel="noopener">https://github.com/fanyushuai/fanyushuai.github.io.git（到gitgub新建repositories）</a><br>     branch: master<br>7.npm install hexo-deployer-git –save</p>
-<p>8.hexo deploy<br>9.hexo server</p>
-<p>注意：每次部署的步骤，可按以下三步来进行。<br>1.hexo clean<br>2.hexo generate<br>3.hexo deploy<br>一气呵成：hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</p>
+        <p>#-<em>- coding: UTF-8 -</em>-<br>‘’’<br>Created on 2018-1-23</p>
+<p>@author: 土肥圆<br>‘’’</p>
+<p>import cv2<br>import numpy as np</p>
+<p>#打开1号摄像头<br>cap = cv2.VideoCapture(0)</p>
+<p>#读取一桢图像，前一个返回值是是否成功，后一个返回值是图像本身<br>success, frame = cap.read()</p>
+<p>#设置人脸框的颜色<br>color = (0,255,0)</p>
+<p>#定义分类器<br>face_cascade = cv2.CascadeClassifier(‘../config/cv2/haarcascade_frontalface_alt.xml’)</p>
+<p>while success:<br>    success, frame = cap.read()</p>
+<pre><code>#获得当前桢彩色图像的大小
+size = frame.shape[:2]
 
+#定义一个与当前桢图像大小相同的的灰度图像矩阵
+image = np.zeros(size,dtype=np.float16)
+
+#将当前桢图像转换成灰度图像（这里有修改）
+image = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+#灰度图像进行直方图等距化
+cv2.equalizeHist(image, image)
+
+#如下三行是设定最小图像的大小
+divisor =8
+h, w = size
+
+#这里加了一个取整函数
+minSize = (int(w/divisor), int(h/divisor))
+
+#人脸检测
+faces = face_cascade.detectMultiScale(
+                                  image,
+                                  scaleFactor=1.1,#表示在前后两次相继的扫描中，搜索窗口的比例系数。默认为1.1即每次搜索窗口依次扩大10%;
+                                  minNeighbors=3,#表示构成检测目标的相邻矩形的最小个数(默认为3个)。如果组成检测目标的小矩形的个数和小于 min_neighbors - 1 都会被排除。如果min_neighbors 为 0, 则函数不做任何操作就返回所有的被检候选矩形框，这种设定值一般用在用户自定义对检测结果的组合程序上；
+                                  minSize=minSize
+                                  )
+
+#如果人脸数组长度大于0
+if len(faces) &gt; 0:
+    for face in faces:
+            #对每一个人脸画矩形框
+            x, y, w, h = face
+            cv2.rectangle(frame, (x, y), (x+w, y+h), color,2)
+    print &apos;有人来了&apos;
+#显示图像
+cv2.imshow(&quot;test&quot;, frame)
+key = cv2.waitKey(10)
+c = chr(key &amp; 255)
+if c in [&apos;q&apos;, &apos;Q&apos;, chr(27)]:
+    break
+</code></pre>
     </div>
 
     <div class="post-footer">   
@@ -181,8 +226,8 @@
 
 <div class="article-nav prev-next-wrap clearfix">
     
-        <a href="/2017/11/20/现在的人啊/" class="pre-post btn btn-default"><i class="fa fa-angle-left fa-fw"></i>上一篇</a>
     
+        <a href="/2017/11/20/现在的人啊/" class="next-post btn btn-default">下一篇<i class="fa fa-angle-right fa-fw"></i></a>
     
 </div>
 
