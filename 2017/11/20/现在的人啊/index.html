@@ -154,6 +154,9 @@
 
             
             
+			阅读数:
+				<span id="/2017/11/20/现在的人啊/" class="leancloud_visitors" data-flag-title="现在的人啊"></span>次
+			
     </div>
     
     <div class="post-body">
@@ -293,6 +296,49 @@
         <div class="row">
         </div>
     </div>
+	<script src="//cdn1.lncld.net/static/js/2.5.0/av-min.js"></script>
+	<script>
+		var APP_ID = 'QNr6zQWX8nzs9alWfAoG4KW9-gzGzoHsz';
+		var APP_KEY = 'vALagihA6ROUf7XXp1sjDD2j';
+		AV.init({
+			appId: APP_ID,
+			appKey: APP_KEY
+		});
+		// 显示次数
+		function showTime(Counter) {
+			var query = new AV.Query("Counter");
+			if($(".leancloud_visitors").length > 0){
+				var url = $(".leancloud_visitors").attr('id').trim();
+				// where field
+				query.equalTo("words", url);
+				// count 
+				query.count().then(function (number) {
+					alert(number);
+					// There are number instances of MyClass where words equals url.
+					$(document.getElementById(url)).text(number?  number : '--');
+				}, function (error) {
+					alert("error");
+					// error is an instance of AVError.
+				});
+			}
+		}
+	   // 追加pv
+		function addCount(Counter) {
+			var url = $(".leancloud_visitors").length > 0 ? $(".leancloud_visitors").attr('id').trim() : 'icafebolger.com';
+			var Counter = AV.Object.extend("Counter");
+			var query = new Counter;
+			query.save({
+				words: url
+			}).then(function (object) {
+			})
+		}
+		$(function () {
+			var Counter = AV.Object.extend("Counter");
+			alert(Counter);
+			addCount(Counter);
+			showTime(Counter);
+		});
+	</script>
 </footer>
 
 
