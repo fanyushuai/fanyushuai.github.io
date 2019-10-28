@@ -171,6 +171,35 @@
 <p>注意：每次部署的步骤，可按以下三步来进行。<br>1.hexo clean<br>2.hexo generate<br>3.hexo deploy<br>一气呵成：hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</p>
 
     </div>
+	
+	
+		<div id="comments">
+			
+    <script src="https://cdn.jsdelivr.net/gh/theme-next/theme-next-gitment@1/gitment.browser.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/theme-next/theme-next-gitment@1/default.css"/>
+    <script>
+    var gitment = new Gitment({
+        id: window.location.pathname,
+        owner:"fanyushuai",
+        repo:"myblog",
+        oauth: {
+          client_id:"6dcbd5facb33ed660a2d",
+          client_secret:"eb37097f75b4e1d0f0b3badd19c82cfb5fb74dca"
+        },
+        perPage:"10",
+    });
+    gitment.render('comments');
+    </script>
+
+
+
+
+
+
+
+
+		</div>
+	
 
     <div class="post-footer">   
         <div>
@@ -195,33 +224,6 @@
     
 </div>
 
-
-    <div id="comments">
-        
-    <script src="https://cdn.jsdelivr.net/gh/theme-next/theme-next-gitment@1/gitment.browser.js"></script>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/theme-next/theme-next-gitment@1/default.css"/>
-    <script>
-    var gitment = new Gitment({
-        id: window.location.pathname,
-        owner:"fanyushuai",
-        repo:"myblog",
-        oauth: {
-          client_id:"6dcbd5facb33ed660a2d",
-          client_secret:"eb37097f75b4e1d0f0b3badd19c82cfb5fb74dca"
-        },
-        perPage:"10",
-    });
-    gitment.render('comments');
-    </script>
-
-
-
-
-
-
-
-
-    </div>
 
 
 

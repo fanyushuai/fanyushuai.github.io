@@ -1,44 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search>
-  <entry>
-    <title><![CDATA[mysql]]></title>
-    <url>%2F2019%2F10%2F28%2Fmysql%2F</url>
-    <content type="text"><![CDATA[1.mysql 按in条件中的字段排序SELECT * FROM 表名 WHERE id in(值) order by field(字段,值) 2.查询按照分组将多条记录转换成单条记录的group_concat([DISTINCT] 要连接的字段 [Order BY ASC/DESC 排序字段] [Separator &apos;分隔符&apos;]) 查询后字段是有长度的，可以执行以下语句进行查询: show variables like &apos;group_concat_max_len&apos; 修改的方式有两种： 1.在my.ini [mysql]后面加入 （需重启）： &apos;group_concat_max_len = 102400000&apos; 2.执行以下语句（重启失效）： SET GLOBAL group_concat_max_len=1024000;]]></content>
-      <categories>
-        <category>mysql</category>
-      </categories>
-      <tags>
-        <tag>mysql 语句</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title><![CDATA[python 人脸识别-Haar Cascade]]></title>
-    <url>%2F2018%2F01%2F29%2Fpython-%E6%91%84%E5%83%8F%E5%A4%B4%E4%BA%BA%E8%84%B8%E8%AF%86%E5%88%AB-Haar-Cascade%2F</url>
-    <content type="text"><![CDATA[#-- coding: UTF-8 --‘’’Created on 2018-1-23 @author: 土肥圆‘’’ import cv2import numpy as np #打开1号摄像头cap = cv2.VideoCapture(0) #读取一桢图像，前一个返回值是是否成功，后一个返回值是图像本身success, frame = cap.read() #设置人脸框的颜色color = (0,255,0) #定义分类器face_cascade = cv2.CascadeClassifier(‘../config/cv2/haarcascade_frontalface_alt.xml’) while success: success, frame = cap.read() #获得当前桢彩色图像的大小 size = frame.shape[:2] #定义一个与当前桢图像大小相同的的灰度图像矩阵 image = np.zeros(size,dtype=np.float16) #将当前桢图像转换成灰度图像（这里有修改） image = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) #灰度图像进行直方图等距化 cv2.equalizeHist(image, image) #如下三行是设定最小图像的大小 divisor =8 h, w = size #这里加了一个取整函数 minSize = (int(w/divisor), int(h/divisor)) #人脸检测 faces = face_cascade.detectMultiScale( image, scaleFactor=1.1,#表示在前后两次相继的扫描中，搜索窗口的比例系数。默认为1.1即每次搜索窗口依次扩大10%; minNeighbors=3,#表示构成检测目标的相邻矩形的最小个数(默认为3个)。如果组成检测目标的小矩形的个数和小于 min_neighbors - 1 都会被排除。如果min_neighbors 为 0, 则函数不做任何操作就返回所有的被检候选矩形框，这种设定值一般用在用户自定义对检测结果的组合程序上； minSize=minSize ) #如果人脸数组长度大于0 if len(faces) &gt; 0: for face in faces: #对每一个人脸画矩形框 x, y, w, h = face cv2.rectangle(frame, (x, y), (x+w, y+h), color,2) print &apos;有人来了&apos; #显示图像 cv2.imshow(&quot;test&quot;, frame) key = cv2.waitKey(10) c = chr(key &amp; 255) if c in [&apos;q&apos;, &apos;Q&apos;, chr(27)]: break]]></content>
-      <categories>
-        <category>python</category>
-      </categories>
-      <tags>
-        <tag>Haar Cascade</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title><![CDATA[现在的人啊]]></title>
-    <url>%2F2017%2F11%2F20%2F%E7%8E%B0%E5%9C%A8%E7%9A%84%E4%BA%BA%E5%95%8A%2F</url>
-    <content type="text"><![CDATA[离不开个手机，一天天的]]></content>
-      <categories>
-        <category>other</category>
-      </categories>
-      <tags>
-        <tag>other</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title><![CDATA[Hello Hexo]]></title>
-    <url>%2F2017%2F11%2F17%2Fhello-world%2F</url>
-    <content type="text"><![CDATA[Hexo,终于弄好了！1.安装nodejs2.安装git3.新建文件夹进入sudo npm install -g hexo （切换淘宝镜像npm config set registry https://registry.npm.taobao.org，查看npm config get registry）4.hexo init5.hexo generate（hexo g）6.修改 _config.ymldeploy: type: git repo: https://github.com/fanyushuai/fanyushuai.github.io.git（到gitgub新建repositories） branch: master7.npm install hexo-deployer-git –save 8.hexo deploy9.hexo server 注意：每次部署的步骤，可按以下三步来进行。1.hexo clean2.hexo generate3.hexo deploy一气呵成：hexo clean &amp;&amp; hexo g &amp;&amp; hexo d]]></content>
-      <tags>
-        <tag>hexo</tag>
-      </tags>
-  </entry>
+<search> 
+  
+    
+    <entry>
+      <title><![CDATA[mysql]]></title>
+      <url>/2019/10/28/mysql/</url>
+      <content type="html"><![CDATA[<h5 id="1-mysql-按in条件中的字段排序"><a href="#1-mysql-按in条件中的字段排序" class="headerlink" title="1.mysql 按in条件中的字段排序"></a>1.mysql 按in条件中的字段排序</h5><pre><code>SELECT * FROM 表名 WHERE id in(值) order by field(字段,值)
+</code></pre><h4 id="2-查询按照分组将多条记录转换成单条记录的"><a href="#2-查询按照分组将多条记录转换成单条记录的" class="headerlink" title="2.查询按照分组将多条记录转换成单条记录的"></a>2.查询按照分组将多条记录转换成单条记录的</h4><pre><code>group_concat([DISTINCT] 要连接的字段 [Order BY ASC/DESC 排序字段]     [Separator &apos;分隔符&apos;])
+</code></pre><p>查询后字段是有长度的，可以执行以下语句进行查询:</p>
+<pre><code>show variables like &apos;group_concat_max_len&apos;
+</code></pre><p>修改的方式有两种：</p>
+<p>1.在my.ini [mysql]后面加入 （需重启）：</p>
+<pre><code>&apos;group_concat_max_len = 102400000&apos;
+</code></pre><p>2.执行以下语句（重启失效）：</p>
+<pre><code>SET GLOBAL group_concat_max_len=1024000;
+</code></pre>]]></content>
+      
+        <categories>
+            
+            <category> mysql </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> mysql 语句 </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[python 人脸识别-Haar Cascade]]></title>
+      <url>/2018/01/29/python-%E6%91%84%E5%83%8F%E5%A4%B4%E4%BA%BA%E8%84%B8%E8%AF%86%E5%88%AB-Haar-Cascade/</url>
+      <content type="html"><![CDATA[<p>#-<em>- coding: UTF-8 -</em>-<br>‘’’<br>Created on 2018-1-23</p>
+<p>@author: 土肥圆<br>‘’’</p>
+<p>import cv2<br>import numpy as np</p>
+<p>#打开1号摄像头<br>cap = cv2.VideoCapture(0)</p>
+<p>#读取一桢图像，前一个返回值是是否成功，后一个返回值是图像本身<br>success, frame = cap.read()</p>
+<p>#设置人脸框的颜色<br>color = (0,255,0)</p>
+<p>#定义分类器<br>face_cascade = cv2.CascadeClassifier(‘../config/cv2/haarcascade_frontalface_alt.xml’)</p>
+<p>while success:<br>    success, frame = cap.read()</p>
+<pre><code>#获得当前桢彩色图像的大小
+size = frame.shape[:2]
+
+#定义一个与当前桢图像大小相同的的灰度图像矩阵
+image = np.zeros(size,dtype=np.float16)
+
+#将当前桢图像转换成灰度图像（这里有修改）
+image = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+#灰度图像进行直方图等距化
+cv2.equalizeHist(image, image)
+
+#如下三行是设定最小图像的大小
+divisor =8
+h, w = size
+
+#这里加了一个取整函数
+minSize = (int(w/divisor), int(h/divisor))
+
+#人脸检测
+faces = face_cascade.detectMultiScale(
+                                  image,
+                                  scaleFactor=1.1,#表示在前后两次相继的扫描中，搜索窗口的比例系数。默认为1.1即每次搜索窗口依次扩大10%;
+                                  minNeighbors=3,#表示构成检测目标的相邻矩形的最小个数(默认为3个)。如果组成检测目标的小矩形的个数和小于 min_neighbors - 1 都会被排除。如果min_neighbors 为 0, 则函数不做任何操作就返回所有的被检候选矩形框，这种设定值一般用在用户自定义对检测结果的组合程序上；
+                                  minSize=minSize
+                                  )
+
+#如果人脸数组长度大于0
+if len(faces) &gt; 0:
+    for face in faces:
+            #对每一个人脸画矩形框
+            x, y, w, h = face
+            cv2.rectangle(frame, (x, y), (x+w, y+h), color,2)
+    print &apos;有人来了&apos;
+#显示图像
+cv2.imshow(&quot;test&quot;, frame)
+key = cv2.waitKey(10)
+c = chr(key &amp; 255)
+if c in [&apos;q&apos;, &apos;Q&apos;, chr(27)]:
+    break
+</code></pre>]]></content>
+      
+        <categories>
+            
+            <category> python </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> Haar Cascade </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[现在的人啊]]></title>
+      <url>/2017/11/20/%E7%8E%B0%E5%9C%A8%E7%9A%84%E4%BA%BA%E5%95%8A/</url>
+      <content type="html"><![CDATA[<p>离不开个手机，一天天的</p>
+]]></content>
+      
+        <categories>
+            
+            <category> other </category>
+            
+        </categories>
+        
+        
+        <tags>
+            
+            <tag> other </tag>
+            
+        </tags>
+        
+    </entry>
+    
+    <entry>
+      <title><![CDATA[Hello Hexo]]></title>
+      <url>/2017/11/17/hello-world/</url>
+      <content type="html"><![CDATA[<p>Hexo,终于弄好了！<br>1.安装nodejs<br>2.安装git<br>3.新建文件夹进入<br>sudo npm install -g hexo （切换淘宝镜像npm config set registry <a href="https://registry.npm.taobao.org，查看npm" target="_blank" rel="noopener">https://registry.npm.taobao.org，查看npm</a> config get registry）<br>4.hexo init<br>5.hexo generate（hexo g）<br>6.修改 _config.yml<br>deploy:<br>     type: git<br>     repo: <a href="https://github.com/fanyushuai/fanyushuai.github.io.git（到gitgub新建repositories）" target="_blank" rel="noopener">https://github.com/fanyushuai/fanyushuai.github.io.git（到gitgub新建repositories）</a><br>     branch: master<br>7.npm install hexo-deployer-git –save</p>
+<p>8.hexo deploy<br>9.hexo server</p>
+<p>注意：每次部署的步骤，可按以下三步来进行。<br>1.hexo clean<br>2.hexo generate<br>3.hexo deploy<br>一气呵成：hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</p>
+]]></content>
+      
+        
+        <tags>
+            
+            <tag> hexo </tag>
+            
+        </tags>
+        
+    </entry>
+    
+  
+  
 </search>
