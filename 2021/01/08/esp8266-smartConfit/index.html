@@ -19,10 +19,11 @@
     <link rel="dns-prefetch" href="http://yoursite.com">
     <!--SEO-->
 
-<meta name="keywords" content="hexo" />
+<meta name="keywords" content="esp8266 smartConfig" />
 
 
-<meta name="description" content="Hexo,终于弄好了！1.安装nodejs2.安装git3.新建文件夹进入sudo npm install -g hexo （切换淘宝镜像npm config set registry http..." />
+<meta name="description" content="1.开机去读取本机的/wifis.json文件里面的默认wifi去链接2.如果都链接不成功，开启smartConfig3.smartConfig不成功，自己开启wifi，连接后可控制板载led
+..." />
 
 
 <meta name="robots" content="all" />
@@ -33,7 +34,7 @@
 
 <title>
     
-    Hello Hexo |
+    esp8266 smartConfit |
     
     Hexo
 </title>
@@ -140,9 +141,9 @@
                     <p id="process"></p>
 <article class="post">
     <div class="post-head">
-        <h1 id="Hello Hexo">
+        <h1 id="esp8266 smartConfit">
             
-            Hello Hexo
+            esp8266 smartConfit
             
         </h1>
         <div class="post-meta">
@@ -157,7 +158,7 @@
         <i class="fa fa-tags"></i>
         <span class="tags-meta">
             
-            <a class="tag-none-link" href="/tags/hexo/" rel="tag">hexo</a>
+            <a class="tag-none-link" href="/tags/esp8266-smartConfig/" rel="tag">esp8266 smartConfig</a>
             
         </span>
     </span>
@@ -167,26 +168,257 @@
     <span class="fa-wrap">
         <i class="fa fa-clock-o"></i>
         <span class="date-meta">
-            2017/11/17</span>
+            2021/01/08</span>
     </span>
     
     
 </div>
         
         
-        <p class="fa fa-exclamation-triangle warning">
-            本文于<strong>
-                1148</strong>
-            天之前发表，文中内容可能已经过时。
-        </p>
-        
     </div>
     
     <div class="post-body post-content">
-        <p>Hexo,终于弄好了！<br>1.安装nodejs<br>2.安装git<br>3.新建文件夹进入<br>sudo npm install -g hexo （切换淘宝镜像npm config set registry <a target="_blank" rel="noopener" href="https://registry.npm.taobao.org，查看npm">https://registry.npm.taobao.org，查看npm</a> config get registry）<br>4.hexo init<br>5.hexo generate（hexo g）<br>6.修改 _config.yml<br>deploy:<br>     type: git<br>     repo: <a target="_blank" rel="noopener" href="https://github.com/fanyushuai/fanyushuai.github.io.git（到gitgub新建repositories）">https://github.com/fanyushuai/fanyushuai.github.io.git（到gitgub新建repositories）</a><br>     branch: master<br>7.npm install hexo-deployer-git –save</p>
-<p>8.hexo deploy<br>9.hexo server</p>
-<p>注意：每次部署的步骤，可按以下三步来进行。<br>1.hexo clean<br>2.hexo generate<br>3.hexo deploy<br>一气呵成：hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</p>
+        <p>1.开机去读取本机的/wifis.json文件里面的默认wifi去链接<br>2.如果都链接不成功，开启smartConfig<br>3.smartConfig不成功，自己开启wifi，连接后可控制板载led</p>
+<pre><code>#include &lt;Arduino.h&gt;
+#include &lt;ArduinoJson.h&gt;
+#include &lt;ESP8266WiFi.h&gt;
+#include &lt;ESP8266WiFiMulti.h&gt;
+#include &lt;ESP8266WebServer.h&gt;
+#include &lt;FS.h&gt;
 
+ESP8266WiFiMulti wifiMulti;
+DynamicJsonBuffer djb;
+
+ESP8266WebServer server(80);
+
+void smartConfig() &#123;
+  //切换模式
+  WiFi.mode(WIFI_STA);
+  Serial.println(&quot;waitting for SmartConfig...&quot;);
+
+  //开启smartConfig模式
+  WiFi.beginSmartConfig();
+  int i = 0;
+
+  //等待
+  while (!WiFi.smartConfigDone()) &#123;
+    Serial.print(&quot;.&quot;);
+    delay(1000);
+
+    i++;
+
+    //超时
+    if (i == 30) &#123;
+      Serial.println(&quot;smartConfig timeout 30s&quot;);
+      WiFi.stopSmartConfig();
+      break;
+    &#125;
+  &#125;
+
+  //连接到了wifi 打印 写入配置文件
+  if (wifiMulti.run() == WL_CONNECTED) &#123;
+    Serial.println(&quot;smartConfig success&quot;);
+    Serial.printf(&quot;SSID:%s\r\n&quot;, WiFi.SSID().c_str());
+    Serial.printf(&quot;PSW:%s\r\n&quot;, WiFi.psk().c_str());
+    wifiMulti.addAP(WiFi.SSID().c_str(), WiFi.psk().c_str());
+    writeFile(WiFi.SSID().c_str(), WiFi.psk().c_str());
+    ledCtrl(&quot;on&quot;);
+  &#125; else &#123;
+    //配置文件里面都不能连接 配置为服务器模式
+    IPAddress softLocal(192, 168, 1, 1);
+    IPAddress softGateway(192, 168, 1, 1);
+    IPAddress softSubnet(255, 255, 255, 0);
+    WiFi.softAPConfig(softLocal, softGateway, softSubnet);
+    WiFi.softAP(&quot;esp8266-192.168.1.1&quot;, &quot;esp8266666&quot;);
+
+    startServer();
+  &#125;
+&#125;
+
+/**
+   开始页面
+*/
+void homepage() &#123;
+  String filecontend = readFile(&quot;/index.html&quot;);
+  if (filecontend) &#123;
+    server.send(200, &quot;text/html&quot;, filecontend);
+  &#125; else &#123;
+    Serial.println(&quot;index.html is empty&quot;);
+  &#125;
+&#125;
+
+/**
+ * 控制等
+ */
+void pin() &#123;
+  String type = &quot;&quot;;
+  if (server.arg(&quot;light&quot;) == &quot;on&quot;) &#123;
+    type = &quot;on&quot;;
+  &#125; else if (server.arg(&quot;light&quot;) == &quot;off&quot;) &#123;
+    type = &quot;off&quot;;
+  &#125;
+  server.send(200, &quot;text/html&quot;, type);
+  ledCtrl(type);
+&#125;
+
+/**
+   启动服务
+*/
+void startServer() &#123;
+  server.on(&quot;/&quot;, homepage);
+  server.on(&quot;/pin&quot;, pin);
+  server.begin();
+  Serial.println(&quot;&quot;);
+  Serial.print(&quot;server start on http://&quot;);
+  Serial.print(WiFi.softAPIP());
+  Serial.println(&quot;:80&quot;);
+&#125;
+
+/**
+   把已连接的wifi 写入配置文件
+*/
+void writeFile(String ssid, String pwd) &#123;
+  String fileContent = readFile(&quot;/wifis.json&quot;);
+  if (fileContent != &quot;&quot;) &#123;
+    JsonObject&amp; jo = djb.parse(fileContent);
+    if (jo.containsKey(&quot;wifis&quot;)) &#123;
+      JsonArray&amp; ja = jo[&quot;wifis&quot;];
+      JsonObject&amp; newObj = djb.createObject();
+      newObj[&quot;ssid&quot;] = ssid;
+      newObj[&quot;pwd&quot;] = pwd;
+      ja.add(newObj);
+      //jo = djb.createObject();
+      jo[&quot;wifis&quot;] = ja;
+      File jsonFile = SPIFFS.open(&quot;/wifis.json&quot;, &quot;w+&quot;);
+      if (jsonFile) &#123;
+        jsonFile.print(jo.printTo(jsonFile));
+        //打印
+        jo.printTo(Serial);
+      &#125; else &#123;
+        Serial.println(&quot;wifis.json write failed&quot;);
+      &#125;
+
+      jsonFile.close();
+    &#125;
+  &#125;
+&#125;
+
+/**
+   读取文件 返回文件内容
+*/
+String readFile(String filename) &#123;
+  if (SPIFFS.begin()) &#123;
+    Serial.println(&quot;SPIFFS started&quot;);
+  &#125; else &#123;
+    Serial.println(&quot;SPIFFS start failed&quot;);
+  &#125;
+
+  if (SPIFFS.exists(filename)) &#123;
+    Serial.print(filename);
+    Serial.println(&quot; Found ...&quot;);
+  &#125; else &#123;
+    Serial.print(filename);
+    Serial.println(&quot; Not Found ...&quot;);
+  &#125;
+  File file = SPIFFS.open(filename, &quot;r&quot;);
+  if (!file) &#123;
+    Serial.println(filename + &quot;open failed&quot;);
+  &#125;
+  String fileContent = &quot;&quot;;
+  if (file.size() &gt; 0) &#123;
+    for (int i = 0; i &lt; file.size(); i++) &#123;
+      fileContent += (char)file.read();
+    &#125;
+
+    Serial.println(fileContent);
+  &#125; else &#123;
+    Serial.println(filename + &quot; is empty&quot;);
+  &#125;
+  file.close();
+  return fileContent;
+&#125;
+
+void setup() &#123;
+  Serial.begin(2000000);
+  //板载灯
+  pinMode(LED_BUILTIN, OUTPUT);
+  Serial.println();
+  Serial.println(&quot;start to config&quot;);
+  wifiMulti.run();
+
+  //判断是否已自动连接到wifi
+  if (wifiMulti.run() == WL_CONNECTED) &#123;
+    Serial.print(&quot;&quot;);
+    Serial.println(&quot;connect success&quot;);
+    Serial.println(&quot;ip:&quot;);
+    Serial.println(WiFi.localIP());
+  &#125; else if (wifiMulti.run() != WL_CONNECTED) &#123;
+    Serial.println(&quot;not connected&quot;);
+    //先判断wifis.json是否有记录 有 读取 没有 smartConfig
+
+    String fileContent = readFile(&quot;/wifis.json&quot;);
+    if (fileContent != &quot;&quot;) &#123;
+      WiFi.mode(WIFI_STA);
+      JsonObject&amp; jo = djb.parse(fileContent);
+      if (jo.containsKey(&quot;wifis&quot;)) &#123;
+        JsonArray&amp; ja = jo[&quot;wifis&quot;];
+        const char* ssid;
+        const char* pwd;
+        for (int i = 0; i &lt; ja.size(); i++) &#123;
+          ssid = ja[i][&quot;ssid&quot;];
+          pwd = ja[i][&quot;pwd&quot;];
+          wifiMulti.addAP(ssid, pwd);
+          Serial.println(&quot;connect by wifis.json&quot;);
+          Serial.print(&quot;ssid:&quot;);
+          Serial.println(ssid);
+          Serial.print(&quot;pwd:&quot;);
+          Serial.println(pwd);
+          int j = 0;
+          while (wifiMulti.run() != WL_CONNECTED) &#123;
+            delay(500);
+            j ++;
+            //等待20s
+            if (j == 20) &#123;
+              Serial.print(&quot;connect to &quot;);
+              Serial.print(ssid);
+              Serial.println(&quot; failed:timeout 20s&quot;);
+              break;
+            &#125;
+          &#125;
+
+          //连接到了wifi 打印ip
+          if (wifiMulti.run() == WL_CONNECTED) &#123;
+            Serial.println(&quot;connect success&quot;);
+            Serial.println(&quot;ip:&quot;);
+            Serial.println(WiFi.localIP());
+            ledCtrl(&quot;on&quot;);
+          &#125;
+        &#125;
+      &#125; else &#123;
+        Serial.println(&quot;wifis.json is empty&quot;);
+      &#125;
+    &#125;
+
+    //从配置文件读取失败 开始smartConfig 配置
+    if (wifiMulti.run() != WL_CONNECTED) &#123;
+      smartConfig();
+    &#125;
+  &#125;
+&#125;
+
+void ledCtrl(String type) &#123;
+  if (type == &quot;on&quot;) &#123;
+    digitalWrite(LED_BUILTIN, LOW);
+  &#125; else if (type == &quot;off&quot;) &#123;
+    digitalWrite(LED_BUILTIN, HIGH);
+  &#125;
+&#125;
+
+void loop() &#123;
+  //监听客户请求并处理
+  server.handleClient();
+&#125;
+</code></pre>
     </div>
     
     <div class="post-footer">
@@ -204,12 +436,12 @@
 </article>
 <div class="article-nav prev-next-wrap clearfix">
     
-    <a href="/2017/11/20/%E7%8E%B0%E5%9C%A8%E7%9A%84%E4%BA%BA%E5%95%8A/" class="pre-post btn btn-default" title='现在的人啊'>
-        <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
-        <span class="hidden-xs">
-            现在的人啊</span>
-    </a>
     
+    <a href="/2019/10/28/mysql/" class="next-post btn btn-default" title='mysql'>
+        <span class="hidden-lg">下一篇</span>
+        <span class="hidden-xs">
+            mysql</span><i class="fa fa-angle-right fa-fw"></i>
+    </a>
     
 </div>
 
