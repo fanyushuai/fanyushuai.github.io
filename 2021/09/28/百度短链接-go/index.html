@@ -1,0 +1,539 @@
+<!DOCTYPE HTML>
+<html lang="">
+
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="Hexo">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="http://yoursite.com">
+    <!--SEO-->
+
+<meta name="keywords" content="" />
+
+
+<meta name="description" content="某业务需要把大量的长链接转换为短链接，当时正在学习go，就试了一下，逻辑是从excel（只有一列，存放待转换的长链接）读取长链接，然后分批次（百度这个口支持每次200条）调用百度长连接转短链接a..." />
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+<title>
+    
+    百度短链接-go |
+    
+    Hexo
+</title>
+
+<link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+
+<link rel="icon" href="/favicon.ico">
+
+    
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash.css">
+
+    
+<div class="hide">
+    <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+</div>
+
+
+
+
+    
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+<body>
+    <header class="main-header"  style="background-image:url(
+    http://snippet.shenliyang.com/img/banner.jpg)"
+     >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='John Doe'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+            <!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+            <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+            
+        </div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                        <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="http://yoursite.com">
+                        Hexo</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/"><i class="fa "></i>
+                                Home</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/#"><i class="fa "></i>
+                                前端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/#"><i class="fa "></i>
+                                后端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/#"><i class="fa "></i>
+                                工具</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/#"><i class="fa "></i>
+                                时间轴</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="百度短链接-go">
+            
+            百度短链接-go
+            
+        </h1>
+        <div class="post-meta">
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a class="category-link" href="/categories/go/">go</a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+        </span>
+    </span>
+    
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-clock-o"></i>
+        <span class="date-meta">
+            2021/09/28</span>
+    </span>
+    
+    
+</div>
+        
+        
+    </div>
+    
+    <div class="post-body post-content">
+        <p>某业务需要把大量的长链接转换为短链接，当时正在学习go，就试了一下，逻辑是从excel（只有一列，存放待转换的长链接）读取长链接，然后分批次（百度这个口支持每次200条）调用百度长连接转短链接api，返回结果存放到log.csv,如果有错误的写到fail.csv里面。下面是代码：</p>
+<pre><code>package main
+
+import (
+    &quot;bufio&quot;
+    &quot;bytes&quot;
+    &quot;crypto/tls&quot;
+    &quot;encoding/csv&quot;
+    &quot;encoding/json&quot;
+    &quot;fmt&quot;
+    &quot;io/ioutil&quot;
+    &quot;log&quot;
+    &quot;net/http&quot;
+    &quot;os&quot;
+    &quot;path/filepath&quot;
+    &quot;strconv&quot;
+    &quot;sync&quot;
+    &quot;time&quot;
+
+    &quot;github.com/tealeg/xlsx&quot;
+)
+
+var (
+    // longURLs  chan string
+    // shortURLs chan string
+    longURLs []string
+    //shortURLs []string
+    shortURLs []map[string]interface&#123;&#125;
+    waitGroup sync.WaitGroup
+    logFile   *os.File
+    failFile  *os.File
+    count     int = 0
+)
+
+//struct 相当于一个实体
+type param struct &#123;
+    LongURL      string
+    TermOfValidity string
+&#125;
+
+type result struct &#123;
+    Code      string
+    ShortUrls []string
+    ErrMsg    string
+&#125;
+
+//读取excel 把第一列长连接放入管道
+func readExcle(excelPath string) &#123;
+    excel, err := xlsx.OpenFile(excelPath)
+    if err != nil &#123;
+        fmt.Println(&quot;读取：&quot; + excelPath + &quot; 错误&quot;)
+    &#125;
+    for _, sheet := range excel.Sheets &#123;
+        i := 0
+        for _, row := range sheet.Rows &#123;
+            i++
+            if i == 1 &#123;
+                continue
+            &#125;
+            j := 0
+            for _, cell := range row.Cells &#123;
+                j++
+                if j == 1 &#123;
+                    //fmt.Println(cell.Value)
+                    //longURLs &lt;- cell.Value
+                    longURLs = append(longURLs, cell.Value)
+                &#125; else &#123;
+                    continue
+                &#125;
+            &#125;
+        &#125;
+    &#125;
+    getShortURL()
+&#125;
+
+//请求接口把 长连接 转换为短链接 200个发一次请求
+func getShortURL() &#123;
+    start := 0
+    end := 0
+    limit := 200
+    size := len(longURLs)
+    num := 0
+    if size%limit == 0 &#123;
+        num = size / limit
+    &#125; else &#123;
+        num = size/limit + 1
+    &#125;
+    for i := 1; i &lt;= num; i++ &#123;
+        urls := []string&#123;&#125;
+        start = (i - 1) * limit
+        if i*limit &gt; size &#123;
+            end = size
+        &#125; else &#123;
+            end = i * limit
+        &#125;
+        urls = longURLs[start:end]
+        waitGroup.Add(1)
+        go request(urls)
+        //&lt;-longURLs
+    &#125;
+    waitGroup.Done()
+&#125;
+
+//发送请求 
+func request(urls []string) &#123;
+    var params []param
+    for _, url := range urls &#123;
+        param := param&#123;
+            LongURL:        url,
+            TermOfValidity: &quot;1-year&quot;, //链接一年有效
+        &#125;
+        params = append(params, param)
+    &#125;
+
+    jsonBytes, err := json.Marshal(params)
+    if err != nil &#123;
+        fmt.Println(&quot;转换json错误&quot;)
+    &#125;
+
+    transCfg := &amp;http.Transport&#123;
+        TLSClientConfig: &amp;tls.Config&#123;InsecureSkipVerify: true&#125;, // disable verify
+    &#125;
+
+    client := &amp;http.Client&#123;Transport: transCfg&#125;
+
+    req, _ := http.NewRequest(&quot;POST&quot;, &quot;https://dwz.cn/api/v3/short-urls&quot;, bytes.NewReader(jsonBytes))
+
+    req.Header.Set(&quot;Dwz-Token&quot;, &quot;&quot;) //需修改
+    req.Header.Set(&quot;Connection&quot;, &quot;Keep-Alive&quot;)
+    req.Header.Set(&quot;Charset&quot;, &quot;UTF-8&quot;)
+    req.Header.Set(&quot;accept&quot;, &quot;application/json&quot;)
+    req.Header.Set(&quot;Content-Type&quot;, &quot;application/json;charset=UTF-8&quot;)
+    req.Header.Set(&quot;Content-Length&quot;, strconv.Itoa(len(jsonBytes)))
+    res, err := client.Do(req)
+
+    if err != nil &#123;
+        //fmt.Println(&quot;返回错误：&quot;)
+        //fmt.Println(err)
+        //request(urls)
+        waitGroup.Add(1)
+        appendToErrLog(urls)
+    &#125; else &#123;
+        if res.StatusCode != 200 &#123;
+            //fmt.Println(res.Status)
+            waitGroup.Add(1)
+            appendToErrLog(urls)
+        &#125; else &#123;
+            resBytes, err := ioutil.ReadAll(res.Body)
+
+            if err != nil &#123;
+                //fmt.Println(&quot;解析错误&quot;)
+                //request(urls)
+                waitGroup.Add(1)
+                appendToErrLog(urls)
+            &#125; else &#123;
+                var jsonObj map[string]interface&#123;&#125;
+                json.Unmarshal(resBytes, &amp;jsonObj)
+                //fmt.Println(&quot;结果&quot;, jsonObj)
+                shortUrls := jsonObj[&quot;ShortUrls&quot;].([]interface&#123;&#125;)
+                waitGroup.Add(1)
+                appendToLog(shortUrls)
+            &#125;
+        &#125;
+    &#125;
+    waitGroup.Done()
+&#125;
+
+//日志
+func appendToLog(shortUrls []interface&#123;&#125;) &#123;
+    w := csv.NewWriter(logFile)
+    datas := make([][]string, 200)
+    for i, item := range shortUrls &#123;
+        shortURL := item.(map[string]interface&#123;&#125;)
+        shortURLs = append(shortURLs, item.(map[string]interface&#123;&#125;))
+        //shortURLs = append(shortURLs, shortURL[&quot;ShortUrl&quot;].(string))
+        datas[i] = []string&#123;shortURL[&quot;LongUrl&quot;].(string), shortURL[&quot;ShortUrl&quot;].(string)&#125;
+    &#125;
+    w.WriteAll(datas)
+    w.Flush()
+    count += len(shortUrls)
+    waitGroup.Done()
+&#125;
+
+//错误日志
+func appendToErrLog(urls []string) &#123;
+    w := csv.NewWriter(logFile)
+    datas := make([][]string, 200)
+    for i, URL := range urls &#123;
+        datas[i] = []string&#123;URL&#125;
+    &#125;
+    w.WriteAll(datas)
+    w.Flush()
+    count += 200
+    waitGroup.Done()
+&#125;
+
+func main() &#123;
+    //longURLs = make(chan string, 100)
+    fmt.Println(&quot;拖动xlsx文件到此,然后回车&quot;)
+    scanner := bufio.NewScanner(os.Stdin)
+    scanner.Scan()
+    filePath := scanner.Text()
+
+    start := time.Now()
+    currentPath, err := os.Executable()
+    if err != nil &#123;
+        log.Println(&quot;获取当前文件夹错误&quot;)
+    &#125;
+    logPath := filepath.Dir(currentPath) + &quot;\\log.csv&quot;
+    _, err = os.Stat(logPath)
+    if os.IsNotExist(err) &#123;
+        logFile, err = os.Create(logPath)
+        if err != nil &#123;
+            log.Println(&quot;创建log.csv文件错误&quot;)
+        &#125;
+    &#125; else &#123;
+        logFile, err = os.OpenFile(logPath, os.O_APPEND|os.O_RDWR, 0666)
+        if err != nil &#123;
+            log.Println(&quot;打开log.csv文件错误&quot;)
+        &#125;
+    &#125;
+
+    failPath := filepath.Dir(currentPath) + &quot;\\fail.csv&quot;
+    _, err = os.Stat(failPath)
+    if os.IsNotExist(err) &#123;
+        failFile, err = os.Create(failPath)
+        if err != nil &#123;
+            log.Println(&quot;fail.csv文件错误&quot;)
+        &#125;
+    &#125; else &#123;
+        failFile, err = os.OpenFile(failPath, os.O_APPEND|os.O_RDWR, 0666)
+        if err != nil &#123;
+            log.Println(&quot;fail.csv文件错误&quot;)
+        &#125;
+    &#125;
+
+    //logFile.WriteString(&quot;\xEF\xBB\xBF&quot;)  // 写入一个UTF-8 BOM
+
+    defer logFile.Close()
+    defer failFile.Close()
+
+    waitGroup.Add(1)
+    readExcle(filePath)
+
+    waitGroup.Wait()
+
+    cost := time.Since(start)
+    fmt.Printf(&quot;共%d条数据,成功%d条,用时%s\n&quot;, len(longURLs), count, cost)
+
+    time.Sleep(5 * time.Second)
+    //waitGroup.Wait()
+&#125;
+</code></pre>
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+            转载声明：
+            商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+    <a href="/2021/09/28/%E5%BC%B9%E5%B9%95%E8%81%8A%E5%A4%A9/" class="next-post btn btn-default" title='弹幕聊天'>
+        <span class="hidden-lg">下一篇</span>
+        <span class="hidden-xs">
+            弹幕聊天</span><i class="fa fa-angle-right fa-fw"></i>
+    </a>
+    
+</div>
+
+<div id="comments">
+    
+
+<div id="vcomments" class="valine"></div>
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+<script>
+new Valine({
+    av: AV,
+    el: '#vcomments',
+    appId: 'QNr6zQWX8nzs9alWfAoG4KW9-gzGzoHsz',
+    appKey: 'vALagihA6ROUf7XXp1sjDD2j',
+    placeholder: '说点什么吧',
+    notify: false,
+    verify: true,
+    avatar: 'mm',
+    meta: 'nick,mail'.split(','),
+    pageSize: '10',
+    path: window.location.pathname,
+    lang: ''.toLowerCase()
+})
+</script>
+
+
+</div>
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">
+            Table of Contents
+        </h3>
+        
+        <p>暂无目录</p>
+        
+    </div>
+</aside>
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+<a id="back-to-top" class="icon-btn hide">
+    <i class="fa fa-chevron-up"></i>
+</a>
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy;
+                    2017
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="/js/app.js?rev=@@hash.js"></script>
+
+</body>
+</html>
