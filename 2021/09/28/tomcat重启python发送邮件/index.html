@@ -22,7 +22,11 @@
 <meta name="keywords" content="" />
 
 
-<meta name="description" content="" />
+<meta name="description" content="restart8080.sh
+#!/bin/bash
+./etc/profile
+tomcatPath=&quot;/opt/tomcat-8080&quot;
+binPath=&quot;$t..." />
 
 
 <meta name="robots" content="all" />
@@ -33,7 +37,7 @@
 
 <title>
     
-    Category: other |
+    tomcat重启python发送邮件 |
     
     Hexo
 </title>
@@ -136,170 +140,178 @@
     <section class="content-wrap">
         <div class="container">
             <div class="row">
-                <main class="col-md-8 main-content ">
-                    <ol class="breadcrumb">
-    
-    <li>
-        other
-    </li>
-    
-</ol>
-
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
 <article class="post">
+    <div class="post-head">
+        <h1 id="tomcat重启python发送邮件">
+            
+            tomcat重启python发送邮件
+            
+        </h1>
+        <div class="post-meta">
     
-    <div class="post-content">
-        <div class="post-head home-post-head">
-            <h1 class="post-title">
-                <a href="/2017/11/20/%E7%8E%B0%E5%9C%A8%E7%9A%84%E4%BA%BA%E5%95%8A/">
-                    现在的人啊</a>
-            </h1>
-            <div class="post-meta"> &bull;
-                <time class="post-date" datetime="" title="">
-                    2017年11月20日
-                </time>
-            </div>
-        </div>
-        <p class="brief">
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
             
-            离不开个手机，一天天的
+        </span>
+    </span>
+    
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-clock-o"></i>
+        <span class="date-meta">
+            2021/09/28</span>
+    </span>
+    
+    
+</div>
+        
+        
+    </div>
+    
+    <div class="post-body post-content">
+        <p>restart8080.sh</p>
+<pre><code>#!/bin/bash
+./etc/profile
+tomcatPath=&quot;/opt/tomcat-8080&quot;
+binPath=&quot;$tomcatPath/bin&quot;
+echo &quot;[info][$(date +&#39;%F %H:%M:%S&#39;)]正在监控tomcat，路径：$tomcatPath&quot;
+pid=`ps -ef | grep tomcat | grep -w $tomcatPath | grep -v &#39;grep&#39; | awk &#39;&#123;print $2&#125;&#39;`
+if [ -n &quot;$pid&quot; ]; then
+  echo &quot;[info][$(date +&#39;%F %H:%M:%S&#39;)]tomcat进程为：$pid&quot;
+  echo &quot;[info][$(date +&#39;%F %H:%M:%S&#39;)]tomcat已经启动，准备使用shutdown命令关闭...&quot;
+  $binPath&quot;/shutdown.sh&quot;
+  sleep 2
 
+  pid=`ps -ef | grep tomcat | grep -w $tomcatPath | grep -v &#39;grep&#39; | awk &#39;&#123;print $2&#125;&#39;`
+  if [ -n &quot;$pid&quot; ]; then
+    echo &quot;[info][$(date +&#39;%F %H:%M:%S&#39;)]使用shutdown命令关闭失败，准备kill进程...&quot;
+    kill -9 $pid
+    echo &quot;[info][$(date +&#39;%F %H:%M:%S&#39;)]kill进程完毕！&quot;
+    sleep 5
+  else
+    echo &quot;[info][$(date +&#39;%F %H:%M:%S&#39;)]使用shutdown命令关闭成功！&quot;
+  fi
+else
+  echo &quot;[info][$(date +&#39;%F %H:%M:%S&#39;)]tomcat未启动！&quot;
+fi
+echo &quot;[info][$(date +&#39;%F %H:%M:%S&#39;)]准备启动tomcat...&quot;
+$binPath&quot;/startup.sh&quot;
+#发送重启邮件
+python sendMail.py &quot;tomcat-8080 start at $(date +&#39;%F %H:%M:%S&#39;)&quot;
+</code></pre><p>sendMail.py</p>
+<pre><code>#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
+import sys
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
+
+content = sys.argv[1]
+print(content)
+
+#第三方 SMTP 服务
+mail_host=&quot;&quot; #设置服务器
+mail_user=&quot;&quot;  #用户名
+mail_pass=&quot;&quot;  #口令 
+
+sender = &#39;&#39; #发送者名称
+receivers = [&#39;&#39;]  #接收邮件，可设置为你的QQ邮箱或者其他邮箱，多个逗号隔开
+
+message = MIMEText(content, &#39;plain&#39;, &#39;utf-8&#39;)
+message[&#39;From&#39;] = Header(&quot;&quot;, &#39;utf-8&#39;) #需修改
+message[&#39;To&#39;] =  Header(&quot;&quot;, &#39;utf-8&#39;) #需修改
+
+subject = &#39;&#39; #需修改
+message[&#39;Subject&#39;] = Header(subject, &#39;utf-8&#39;)
+
+
+try:
+    smtpObj = smtplib.SMTP_SSL() 
+    smtpObj.connect(mail_host, 465)    #25 为 SMTP 端口号
+    smtpObj.login(mail_user,mail_pass)  
+    smtpObj.sendmail(sender, receivers, message.as_string())
+    print &quot;邮件发送成功&quot;
+except smtplib.SMTPException,e:
+    print &quot;Error: 无法发送邮件&quot;
+    print str(e)
+</code></pre>
+    </div>
+    
+    <div class="post-footer">
+        <div>
             
-        </p>
+            转载声明：
+            商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+            
+        </div>
+        <div>
+            
+        </div>
     </div>
 </article>
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+    <a href="/2021/01/08/esp8266-smartConfit/" class="next-post btn btn-default" title='esp8266 smartConfit'>
+        <span class="hidden-lg">下一篇</span>
+        <span class="hidden-xs">
+            esp8266 smartConfit</span><i class="fa fa-angle-right fa-fw"></i>
+    </a>
+    
+</div>
 
+<div id="comments">
+    
+
+<div id="vcomments" class="valine"></div>
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+<script>
+new Valine({
+    av: AV,
+    el: '#vcomments',
+    appId: 'QNr6zQWX8nzs9alWfAoG4KW9-gzGzoHsz',
+    appKey: 'vALagihA6ROUf7XXp1sjDD2j',
+    placeholder: '说点什么吧',
+    notify: false,
+    verify: true,
+    avatar: 'mm',
+    meta: 'nick,mail'.split(','),
+    pageSize: '10',
+    path: window.location.pathname,
+    lang: ''.toLowerCase()
+})
+</script>
+
+
+</div>
 
                 </main>
                 
-                    
-<aside class="col-md-4 sidebar">
-    
-    
-<div class="widget">
-    <h3 class="title">
-        Search
-    </h3>
-    <div id="search-form">
-        <div id="result-mask" class="hide"></div>
-        <div class="search-area">
-            
-            <input id="search-key" type="search" autocomplete="off" placeholder="Search What？">
-            <button type="button" class="search-form-submit" id="search-local">
-                localSearch</button>
-            
-            
-        </div>
-        <div id="result-wrap" class="hide">
-            <div id="search-result"></div>
-        </div>
-        <div class="hide">
-            <template id="search-tpl">
-                <div class="item">
-                    <a href="/{path}" title="{title}">
-                        <div class="title">{title}</div>
-                        <div class="content">{content}</div>
-                    </a>
-                </div>
-            </template>
-        </div>
-    </div>
-</div>
-
-    
-    
-<div class="widget">
-    <h3 class="title">
-        Notification
-    </h3>
-    <div class="notification">
-        <p>
-</p>
-    </div>
-</div>
-
-    
-    
-<div class="widget">
-    <h3 class="title">
-        Social
-    </h3>
-    <div class="content social">
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">
+            Table of Contents
+        </h3>
         
-        <a href="//github.com/shenliyang" rel="external nofollow" title="Github" target="_blank">
-            <i class="git fa fa-git"></i>
-        </a>
-        
-        <a href="mailto:snippet@91h5.cc" rel="external nofollow" title="邮箱" target="_blank">
-            <i class="envelope-o fa fa-envelope-o"></i>
-        </a>
-        
-        <a href="/" rel="external nofollow" title="联系QQ" target="_blank">
-            <i class="qq fa fa-qq"></i>
-        </a>
-        
-        <a href="/" rel="external nofollow" title="微信" target="_blank">
-            <i class="weixin fa fa-weixin"></i>
-        </a>
-        
-        <a href="/" rel="external nofollow" title="QQ群" target="_blank">
-            <i class="users fa fa-users"></i>
-        </a>
-        
-        <a href="/atom.xml" rel="external nofollow" title="RSS" target="_blank">
-            <i class="feed fa fa-feed"></i>
-        </a>
+        <p>暂无目录</p>
         
     </div>
-</div>
-
-    
-    
-<div class="widget">
-    <h3 class="title">
-        Categories
-    </h3>
-    <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/"><i class="fa" aria-hidden="true">mysql</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/other/"><i class="fa" aria-hidden="true">other</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/python/"><i class="fa" aria-hidden="true">python</i></a><span class="category-list-count">1</span></li></ul>
-</div>
-
-    
-    
-<div class="widget">
-    <h3 class="title">
-        Archives
-    </h3>
-    <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/09/"><i class="fa" aria-hidden="true">2021年09月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/"><i class="fa" aria-hidden="true">2021年01月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/"><i class="fa" aria-hidden="true">2019年10月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/"><i class="fa" aria-hidden="true">2018年01月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/"><i class="fa" aria-hidden="true">2017年11月</i></a><span class="archive-list-count">2</span></li></ul>
-</div>
-
-    
-    
-<div class="widget">
-    <h3 class="title">
-        Tag Cloud
-    </h3>
-    <div class="content tag-cloud">
-        
-        <a href="/tags/Haar-Cascade/" style="font-size: 10px;">Haar Cascade</a> <a href="/tags/esp8266-smartConfig/" style="font-size: 10px;">esp8266 smartConfig</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/mysql-%E8%AF%AD%E5%8F%A5/" style="font-size: 10px;">mysql 语句</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
-        
-    </div>
-</div>
-
-    
-    
-<div class="widget">
-    <h3 class="title">
-        Friends
-    </h3>
-    <div class="content friends-link">
-        
-        <a href="https://hexo.io/zh-cn/" class="fa" target="_blank">
-            Hexo官网</a>
-        
-    </div>
-</div>
-
-    
 </aside>
-
                 
             </div>
         </div>
@@ -335,10 +347,6 @@
         </div>
     </div>
 </div>
-
-
-<script src="/js/search.js?rev=@@hash.js"></script>
-
 
 
 
